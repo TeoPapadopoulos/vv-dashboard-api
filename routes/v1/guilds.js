@@ -1,3 +1,6 @@
+import { errorResponse } from '../../schemas/common.schema.js';
+import { guildResponse } from '../../schemas/guilds.schema.js';
+
 export default async function (fastify) {
   fastify.get(
     '/guilds/:guildId',
@@ -12,6 +15,11 @@ export default async function (fastify) {
           properties: {
             guildId: { type: 'string' },
           },
+          required: ['guildId'],
+        },
+        response: {
+          200: guildResponse,
+          ...errorResponse(400, 401, 403, 404),
         },
       },
     },

@@ -14,31 +14,28 @@ export default fp(
     fastify.decorateRequest('guildAccess', null);
     fastify.decorateRequest('guildPremium', null);
 
-    fastify.decorate('requireGuildAccess', async function (req, reply) {
+    fastify.decorate('requireGuildAccess', async function (req) {
       const { guildId } = req.params;
       const membership = req.user.guilds.find((g) => g.id === guildId);
-      if (!membership)
-        return reply
-          .code(403)
-          .send({ error: 'You are not in this guild access denied' });
+      if (!membership) throw fastify.errors.guildAccessDenied();
 
       const guild = await accessService.getActiveGuild(guildId);
-      if (!guild) return reply.code(404).send({ error: 'Guild not found' });
+      if (!guild) throw fastify.errors.guildNotFound(guildId);
 
       req.guild = guild;
       req.guildAccess = membership;
     });
 
-    fastify.decorate('requireGuildPremium', async function (req, reply) {
+    fastify.decorate('requireGuildPremium', async function (req) {
       const activePremium = await premiumService.hasActivePremium(
         req.params.guildId,
       );
-      if (!activePremium)
-        return reply
-          .code(403)
-          .send({ error: 'Guild does not have active premium' });
+      if (!activePremium) throw fastify.errors.premiumRequired();
       req.guildPremium = { active: true };
     });
   },
-  { name: 'accessPolicy', dependencies: ['fastifyEnv', 'mongodb', 'auth', 'repos'] },
+  {
+    name: 'accessPolicy',
+    dependencies: ['fastifyEnv', 'mongodb', 'auth', 'repos', 'errors'],
+  },
 );

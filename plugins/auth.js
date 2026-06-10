@@ -43,13 +43,8 @@ export default fp(
     );
 
     fastify.decorate('requireUser', async function (req, res) {
-      if (!req.user) {
-        return res
-          .status(401)
-          .send({ error: 'Unauthorized' })
-          .redirect('/api/v1/auth/discord/login');
-      }
+      if (!req.user) throw fastify.errors.unauthorized();
     });
   },
-  { name: 'auth', dependencies: ['fastifyEnv', 'cookie', 'mongodb', 'oauth2', 'repos'] },
+  { name: 'auth', dependencies: ['fastifyEnv', 'cookie', 'mongodb', 'oauth2', 'repos', 'sensible', 'errors'] },
 );

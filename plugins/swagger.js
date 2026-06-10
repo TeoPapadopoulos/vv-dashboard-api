@@ -25,7 +25,8 @@ export default fp(
         return swaggerObject;
       },
       transformSpecificationClone: true,
-    });
+    },
+  );
   },
   { name: 'swagger' },
 );

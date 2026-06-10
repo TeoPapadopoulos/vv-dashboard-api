@@ -1,5 +1,4 @@
 /node_modules
-/package-lock.json
 .env
 API_STRUCTURE.md
 DASHBOARD_FEATURES.md

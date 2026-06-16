@@ -16,3 +16,23 @@ export function errorResponse(...statusCodes) {
     statusCodes.map((code) => [code, { $ref: 'ApiError#' }]),
   );
 }
+
+export const analyticsRangeQuery = {
+  $id: 'AnalyticsRangeQuery',
+  type: 'object',
+  properties: {
+    from: {
+      type: 'string',
+      format: 'date-time',
+      description: 'Start of range UTC',
+      examples: ['2025-04-20T00:00:00Z'],
+    },
+    to: {
+      type: 'string',
+      format: 'date-time',
+      description: 'End of range UTC',
+      examples: ['2025-05-20T00:00:00Z'],
+    },
+  },
+  required: ['from', 'to'],
+};

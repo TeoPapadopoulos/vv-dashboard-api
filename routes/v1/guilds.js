@@ -31,4 +31,30 @@ export default async function (fastify) {
       });
     },
   );
+  fastify.get(
+    '/guilds/:guildId/analytics',
+    {
+      onRequest: [fastify.requireUser],
+      preHandler: [fastify.requireGuildAccess, fastify.normalizeAnalyticsRange],
+      schema: {
+        description: 'Get analytics for a guild',
+        tags: ['analytics'],
+        params: {
+          type: 'object',
+          properties: {
+            guildId: { type: 'string' },
+          },
+          required: ['guildId'],
+        },
+        querystring: { $ref: 'AnalyticsRangeQuery#' },
+        response: { ...errorResponse(400, 401, 403) },
+      },
+    },
+    async (req, reply) => {
+      return reply.send({
+        analyticsRange: req.analyticsRange,
+        guildId: req.params.guildId,
+      });
+    },
+  );
 }

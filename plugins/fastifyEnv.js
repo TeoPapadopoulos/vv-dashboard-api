@@ -16,6 +16,7 @@ export default fp(
           'SECRET_KEY',
           'DASHBOARD_URL',
           'PREMIUM_SKU_ID',
+          'FREE_MAX_DAYS',
         ],
         properties: {
           DISCORD_CLIENT_ID: { type: 'string' },
@@ -26,6 +27,7 @@ export default fp(
           SECRET_KEY: { type: 'string' },
           DASHBOARD_URL: { type: 'string' },
           PREMIUM_SKU_ID: { type: 'string' },
+          FREE_MAX_DAYS: { type: 'number' },
         },
       },
       dotenv: true,

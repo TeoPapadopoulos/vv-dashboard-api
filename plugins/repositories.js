@@ -3,6 +3,7 @@ import { createGuildRepository } from '../modules/guilds/guild.repository.js';
 import { createEntitlementRepository } from '../modules/entitlements/entitlement.repository.js';
 import { createAuthSessionsRepository } from '../modules/auth/authSessions.repository.js';
 
+
 export default fp(
   async (fastify) => {
     fastify.decorate('repos', {

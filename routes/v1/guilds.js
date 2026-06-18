@@ -1,5 +1,6 @@
 import { errorResponse } from '../../schemas/common.schema.js';
 import { guildResponse } from '../../schemas/guilds.schema.js';
+import { analyticsOverviewResponse } from '../../schemas/analytics.schema.js';
 
 export default async function (fastify) {
   fastify.get(
@@ -62,11 +63,7 @@ export default async function (fastify) {
     '/guilds/:guildId/overview',
     {
       onRequest: [fastify.requireUser],
-      preHandler: [
-        fastify.requireGuildAccess,
-        fastify.normalizeAnalyticsRange,
-        fastify.requireAnalyticsRangeAccess,
-      ],
+      preHandler: [fastify.requireGuildAccess, fastify.normalizeAnalyticsRange, fastify.requireAnalyticsRangeAccess],
       schema: {
         description: 'Get overview analytics for a guild',
         tags: ['analytics'],
@@ -80,48 +77,12 @@ export default async function (fastify) {
         querystring: { $ref: 'AnalyticsRangeQuery#' },
         response: {
           ...errorResponse(400, 401, 403),
-          200: {
-            type: 'object',
-            properties: {
-              totalUsers: { type: 'number' },
-              totalSessions: { type: 'number' },
-              totalActiveTime: { type: 'number' },
-              averageSessionDuration: { type: 'number' },
-              topChannels: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    channelId: { type: 'string' },
-                    channelName: { type: 'string' },
-                    totalSessions: { type: 'number' },
-                    totalActiveTime: { type: 'number' },
-                  },
-                },
-              },
-              peakActivityHours: { type: 'array', items: { type: 'number' } },
-              cameraUsagePercentage: { type: 'number' },
-              streamingUsagePercentage: { type: 'number' },
-            },
-            required: [
-              'totalUsers',
-              'totalSessions',
-              'totalActiveTime',
-              'averageSessionDuration',
-              'topChannels',
-              'peakActivityHours',
-              'cameraUsagePercentage',
-              'streamingUsagePercentage',
-            ],
-          },
+          200: analyticsOverviewResponse,
         },
       },
     },
     async (req, reply) => {
-      const overview = await fastify.analytics.getGuildOverview(
-        req.params.guildId,
-        req.analyticsRange,
-      );
+      const overview = await fastify.analytics.getGuildOverview(req.params.guildId, req.analyticsRange);
 
       return reply.send(overview);
     },

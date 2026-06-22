@@ -1,4 +1,4 @@
-export function createAnalyticsRepository(collection) {
+export function createGuildAnalyticsRepository(collection) {
   return {
     async getGuildOverview(guildId, from, to) {
       const [result] = await collection
@@ -21,9 +21,10 @@ export function createAnalyticsRepository(collection) {
                     totalUsers: { $addToSet: '$userId' },
                     totalSessions: { $sum: 1 },
                     totalVoiceTime: { $sum: '$totalTime' },
-                    totalActiveTime: { $sum: { $max: [0, '$totalActiveTime'] } },
                     totalCameraTime: { $sum: '$totalCameraOnTime' },
                     totalStreamingTime: { $sum: '$totalStreamingTime' },
+                    firstSessionDate: { $min: '$startTime' },
+                    lastSessionDate: { $max: '$endTime' },
                   },
                 },
                 {
@@ -32,7 +33,6 @@ export function createAnalyticsRepository(collection) {
                     totalUsers: { $size: '$totalUsers' },
                     totalSessions: 1,
                     totalVoiceTime: 1,
-                    totalActiveTime: 1,
                     totalCameraTime: 1,
                     totalStreamingTime: 1,
                     averageSessionDuration: {
@@ -42,6 +42,8 @@ export function createAnalyticsRepository(collection) {
                         0,
                       ],
                     },
+                    firstSessionDate: 1,
+                    lastSessionDate: 1,
                     cameraUsagePercentage: {
                       $cond: [
                         { $gt: ['$totalCameraTime', 0] },
@@ -82,12 +84,9 @@ export function createAnalyticsRepository(collection) {
                     _id: '$channelId',
                     channelName: { $first: '$channelName' },
                     totalSessions: { $sum: 1 },
-                    totalActiveTime: {
-                      $sum: { $max: [0, '$totalActiveTime'] },
-                    },
                   },
                 },
-                { $sort: { totalActiveTime: -1 } },
+                { $sort: { totalSessions: -1 } },
                 { $limit: 5 },
                 {
                   $project: {
@@ -95,7 +94,6 @@ export function createAnalyticsRepository(collection) {
                     channelId: '$_id',
                     channelName: 1,
                     totalSessions: 1,
-                    totalActiveTime: 1,
                   },
                 },
               ],
@@ -117,10 +115,11 @@ export function createAnalyticsRepository(collection) {
         totalUsers: 0,
         totalSessions: 0,
         totalVoiceTime: 0,
-        totalActiveTime: 0,
         averageSessionDuration: 0,
         cameraUsagePercentage: 0,
         streamingUsagePercentage: 0,
+        firstSessionDate: 0,
+        lastSessionDate: 0,
       };
 
       const peakActivityHours = Array.from({ length: 24 }, () => 0);
@@ -132,6 +131,7 @@ export function createAnalyticsRepository(collection) {
         ...totals,
         topChannels: result?.topChannels ?? [],
         peakActivityHours: peakActivityHours,
+        
       };
     },
   };

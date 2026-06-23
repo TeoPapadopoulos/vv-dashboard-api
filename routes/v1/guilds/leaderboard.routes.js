@@ -1,9 +1,12 @@
-import { guildOverviewResponse } from '../../../schemas/analytics.schema.js';
 import { errorResponse } from '../../../schemas/common.schema.js';
+import {
+  leaderboardQuery,
+  leaderboardResponse,
+} from '../../../schemas/analytics.schema.js';
 
 export default async function (fastify) {
   fastify.get(
-    '/overview',
+    '/leaderboard',
     {
       preHandler: [
         fastify.requireGuildAccess,
@@ -11,7 +14,7 @@ export default async function (fastify) {
         fastify.requireAnalyticsRangeAccess,
       ],
       schema: {
-        description: 'Get overview analytics for a guild',
+        description: 'Get the leaderboard for a guild',
         tags: ['analytics'],
         params: {
           type: 'object',
@@ -20,19 +23,21 @@ export default async function (fastify) {
           },
           required: ['guildId'],
         },
-        querystring: { $ref: 'AnalyticsRangeQuery#' },
+        querystring: { $ref: 'AnalyticsRangeQuery#', ...leaderboardQuery },
         response: {
           ...errorResponse(400, 401, 403),
-          200: guildOverviewResponse,
+          200: leaderboardResponse,
         },
       },
     },
     async (req, reply) => {
-      const overview = await fastify.analytics.getGuildOverview(
+      const leaderboard = await fastify.analytics.getLeaderboard(
         req.params.guildId,
         req.analyticsRange,
+        req.query.metric,
+        req.query.limit,
       );
-      return reply.send(overview);
+      return reply.send(leaderboard);
     },
   );
 }

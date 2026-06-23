@@ -1,5 +1,5 @@
-export const analyticsOverviewResponse = {
-  $id: 'AnalyticsOverviewResponse',
+export const guildOverviewResponse = {
+  $id: 'GuildOverviewResponse',
   type: 'object',
   properties: {
     totalUsers: { type: 'number' },
@@ -33,4 +33,48 @@ export const analyticsOverviewResponse = {
     'firstSessionDate',
     'lastSessionDate',
   ],
+};
+
+export const leaderboardQuery = {
+  $id: 'LeaderboardQuery',
+  type: 'object',
+  properties: {
+    metric: {
+      type: 'string',
+      enum: [
+        'activeTime',
+        'totalTime',
+        'cameraTime',
+        'streamingTime',
+        'soloSessions',
+        'multiSessions',
+      ],
+      default: 'activeTime',
+    },
+    limit: { type: 'number', default: 10 },
+  },
+};
+
+const leaderboardEntry = {
+  $id: 'LeaderboardEntry',
+  type: 'object',
+  properties: {
+    userId: { type: 'string' },
+    username: { type: 'string' },
+    value: { type: 'number' },
+    totalSessions: { type: 'number' },
+    totalActiveTime: { type: 'number' },
+    rank: { type: 'number' },
+  },
+};
+export const leaderboardResponse = {
+  $id: 'LeaderboardResponse',
+  type: 'object',
+  properties: {
+    metric: { type: 'string' },
+    total: { type: 'number' },
+    entries: { type: 'array', items: leaderboardEntry },
+    limit: { type: 'number' },
+  },
+  required: ['metric', 'total', 'entries'],
 };

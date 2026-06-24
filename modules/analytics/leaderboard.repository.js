@@ -1,4 +1,4 @@
-export function createLeaderboardsRepository(collection) {
+export function createLeaderboardRepository(collection) {
   return {
     async getActiveTimeLeaderboard(guildId, from, to, limit) {
       const [result] = await collection

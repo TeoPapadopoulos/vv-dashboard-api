@@ -43,7 +43,6 @@ export const leaderboardQuery = {
       type: 'string',
       enum: [
         'activeTime',
-        'totalTime',
         'cameraTime',
         'streamingTime',
         'soloTime',

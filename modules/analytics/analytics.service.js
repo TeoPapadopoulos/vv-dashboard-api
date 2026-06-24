@@ -25,30 +25,10 @@ export function createAnalyticsService(analyticsRepos) {
     },
     async getLeaderboard(guildId, range, metric, limit) {
       const { from, to } = range;
-      const { total, entries } = await (async () => {
-        switch (metric) {
-          case 'activeTime':
-            return analyticsRepos.leaderboards.getActiveTimeLeaderboard(
-              guildId,
-              from,
-              to,
-              limit,
-            );
-          default:
-            return analyticsRepos.leaderboards.getTotalTimeLeaderboard(
-              guildId,
-              from,
-              to,
-              limit,
-            );
-        }
-      })();
-      return {
-        metric,
-        total,
-        entries,
-        limit,
-      };
-    },
+      const data = await analyticsRepos.leaderboards.getLeaderboard(
+        guildId, from, to, limit, metric,
+      );
+      return { metric, limit, ...data };
+    }
   };
 }

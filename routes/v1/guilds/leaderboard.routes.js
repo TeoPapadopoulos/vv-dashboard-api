@@ -12,6 +12,7 @@ export default async function (fastify) {
         fastify.requireGuildAccess,
         fastify.normalizeAnalyticsRange,
         fastify.requireAnalyticsRangeAccess,
+        fastify.requireLeaderboardMetricAccess,
       ],
       schema: {
         description: 'Get the leaderboard for a guild',

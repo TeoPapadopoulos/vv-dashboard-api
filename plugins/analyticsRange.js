@@ -28,6 +28,8 @@ export default fp(
       const isPremium = await premiumService.hasActivePremium(
         req.params.guildId,
       );
+      req.guildPremium = { active: isPremium };
+
       if (isPremium) return;
 
       const { days } = req.analyticsRange;
@@ -35,9 +37,17 @@ export default fp(
         throw fastify.errors.rangeNotAllowed(FREE_MAX_DAYS, days);
       }
     });
+
+    fastify.decorate('requireLeaderboardMetricAccess', async function (req) {
+      const metric = req.query.metric ?? 'activeTime';
+      const limit = req.query.limit ?? 10;
+      if ((metric !== 'activeTime' || limit > 10) && !req.guildPremium?.active) throw fastify.errors.premiumRequired();
+      return;
+
+    })
   },
   {
     name: 'analyticsRange',
-    dependencies: ['fastifyEnv', 'mongodb', 'repos', 'errors'],
+    dependencies: ['fastifyEnv', 'mongodb', 'repos', 'errors', 'accessPolicy'],
   },
 );
